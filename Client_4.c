@@ -12,7 +12,7 @@
 #pragma comment(lib,"AdvApi32.lib")//registry access
 
 #define Buffer 512 //buffer size for RX/TX
-#define def_port "27015" // port for communication
+#define def_port "25787" // port for communication
 
 void red () {
   printf("\033[1;31m");
@@ -22,21 +22,21 @@ void green (){
   printf("\033[1;32m");
 }
 
-// void yellow () {
-//   printf("\033[1;33m");
-// }
+void yellow () {
+  printf("\033[1;33m");
+}
 
-// void blue () {
-//   printf("\033[1;34m");
-// }
+void blue () {
+  printf("\033[1;34m");
+}
 
-// void magenta (){
-//   printf("\033[1;35m");
-// }
+void magenta (){
+  printf("\033[1;35m");
+}
 
-// void cyan (){
-//   printf("\033[1;36m");
-// }
+void cyan (){
+  printf("\033[1;36m");
+}
 
 void reset () {
   printf("\033[0m");
@@ -73,8 +73,19 @@ void printBody(int mistakes) {
     printf("\tMistakes :%d\n", 6-mistakes);        
         
     switch(mistakes) {  
-        
-        case 5: red();
+
+        case 6: magenta();
+        printf("\t _________\n"  
+           "\t|         |\n"  
+           "\t|           \n"
+           "\t|         \n"
+           "\t|            \n"
+           "\t|             \n"  
+           "\t|             \n"); 
+           reset();
+           break;  
+
+        case 5: magenta();
         printf("\t _________\n"  
            "\t|         |\n"  
            "\t|        ( )  \n"
@@ -84,7 +95,7 @@ void printBody(int mistakes) {
            "\t|             \n"); 
            reset();
            break;                         
-        case 4: red();
+        case 4: magenta();
         printf("\t _________\n"  
            "\t|         |\n"  
            "\t|        ( )  \n"
@@ -94,7 +105,7 @@ void printBody(int mistakes) {
            "\t|             \n"); 
            reset();
             break;
-        case 3: red();
+        case 3: magenta();
         printf("\t _________\n"  
            "\t|         |\n"  
            "\t|        ( )   \n"
@@ -104,8 +115,7 @@ void printBody(int mistakes) {
            "\t|             \n"); 
            reset();
            break;
-        case 2:red();
-         red();
+        case 2:magenta();
         printf("\t _________\n"  
            "\t|         |\n"  
            "\t|        ( )   \n"
@@ -115,7 +125,7 @@ void printBody(int mistakes) {
            "\t|             \n"); 
            reset();
            break;
-        case 1: red();
+        case 1: magenta();
         printf("\t _________\n"  
            "\t|         |\n"  
            "\t|        ( )   \n"
@@ -135,16 +145,7 @@ void printBody(int mistakes) {
            "\t|             \n"); 
            reset();
            break;
-        case 6: red();
-        printf("\t _________\n"  
-           "\t|         |\n"  
-           "\t|           \n"
-           "\t|         \n"
-           "\t|            \n"
-           "\t|             \n"  
-           "\t|             \n"); 
-           reset();
-           break;  
+        
         default: break;  
   
     }   
@@ -172,13 +173,15 @@ unsigned int conn(int arg,char **argv,char *sendm,char str[])//__cdecl is functi
         return -1;
     }
 
-    res=getaddrinfo("10.10.131.67",def_port,&hints,&result);    //argv[1] contains host(ex localhost)
+    res=getaddrinfo("10.10.135.186",def_port,&hints,&result);    //argv[1] contains host(ex localhost)
     if(res != 0){
         printf("addr failed ..  .. ");
         WSACleanup();//terminating winsock dll
         return 1;
     }
-
+    blue();
+    printf("\nConnecting .. .. ..\n");
+    reset();
     for(p=result;p != NULL ; p->ai_next){
         ConnectSocket=socket(p->ai_family,p->ai_socktype,p->ai_protocol);//attempt to connect to all sockets untill one is correct
         if (ConnectSocket == INVALID_SOCKET){
@@ -191,9 +194,12 @@ unsigned int conn(int arg,char **argv,char *sendm,char str[])//__cdecl is functi
             closesocket(ConnectSocket);//cant use res since redifined res as the output of connect(). .close used for closing socket(aka disconnecting)
             ConnectSocket = INVALID_SOCKET;
             continue;
-        }
+        }       
         break;
     }
+    cyan();
+    printf("\nConnection Has Been Established\n");
+    reset();
     freeaddrinfo(result);//freeing the addrinfo memoryr̥
 
     if (ConnectSocket==INVALID_SOCKET){//no socket found
@@ -211,6 +217,8 @@ unsigned int conn(int arg,char **argv,char *sendm,char str[])//__cdecl is functi
 }
 
 int main(int arg,char **argv){
+
+    yellow();
     printf("\n\t Be aware you can be hanged!!.");  
   
     printf("\n\n\t Rules : ");  
@@ -220,7 +228,7 @@ int main(int arg,char **argv){
   
     printf("\n\t Syntax : Alphabet");  
     printf("\n\t Example : a \n\n");  
-
+    reset();
 
     int len, i;
     char str[100],wrong[100];
@@ -237,17 +245,24 @@ int main(int arg,char **argv){
     guess[len] = '\0'; 
     char char_g;
     int tries = 6; 
-    printf("\nYou Have To Guess : %s\n",guess) ;
-    printf("\nThe Numbers of Letters in the Word : %d\n",len);  
+    blue();
+    printf("\n\nYou Have To Guess : %s\n",guess) ;
+    printf("\nThe Numbers of Letters in the Word : %d\n",len); 
+    printf("\nYOU HAVE 6 TRIES !! TREAD CAREFULLY.\n"); 
+    reset();
     while (tries--) {
         if(!strcmp(guess,str)){
-            printf("You Win");
+            green();
+            printf("YOU HAVE SURVIVED THE GALLOWS !! CONGRATULATIONS !!");
+            reset();
             closesocket(ConnectSocket);
             WSACleanup();
             return 0;
         }
+        yellow();
         printf("\nGuess a letter: ");
         scanf(" %c", &char_g);
+        reset();
 
         if (char_g>=65 && char_g<=90)
         {
@@ -263,15 +278,19 @@ int main(int arg,char **argv){
         else{*p=char_g;p++;}       
         printBody(tries);
         *p='\0'; 
-        green();
+        red();
         printf("Wrong Letters: %s\n",wrong);       
         reset();
+        green();
         printf("\n%s\n", guess);
-        send(ConnectSocket,guess,(int)strlen(guess),0);
-        send(ConnectSocket,wrong,(int)strlen(wrong),0);               
+        reset();
+        send(ConnectSocket,guess,100,0);
+        send(ConnectSocket,wrong,7,0);               
     }
-    printf("The word was : %s",str);
-    printf("\nGame Over! You Lose!"); 
+    red();
+    printf("The word was : %s\n",str);    
+    printf("\nYOU HAVE BEEN HANGED !! ENJOY YOUR AFTER LIFE."); 
+    reset();
     closesocket(ConnectSocket);
     WSACleanup();   
     return 0;

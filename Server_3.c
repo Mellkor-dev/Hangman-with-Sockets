@@ -12,7 +12,7 @@
 #pragma comment (lib, "Mswsock.lib")
 
 #define Buffer 512
-#define def_port "5357"
+#define def_port "27015"
 
 unsigned int conn(char *str) 
 {
@@ -70,7 +70,7 @@ unsigned int conn(char *str)
     }
 
     freeaddrinfo(result);
-
+    printf("Connection Is Being Established....\n");
     res = listen(ListenSocket, SOMAXCONN);//syntax for listen is (socket , backlog); somaxconn refers to maximum no. of connections in queue(unaccepted).
     if (res == SOCKET_ERROR) {
         printf("listen failed with error: %d\n", WSAGetLastError());
@@ -116,22 +116,30 @@ int main(){
     {
         guess[i]=' ';
     }
-    
-    
+
+    // WSANETWORKEVENTS networkEvents;
+
     unsigned int C_sock;
     printf("Enter word to be guessed: ");   
     scanf("%s", str);
     char *p = str;
-    int i= strlen(str)+6;
+    int i= (strlen(str)+6);
     C_sock = conn(p);
-    while (i>0)
+    while (i>0 && (strcmp(guess,str)!=0))
     {
         recv(C_sock,guess,100,0);
-        recv(C_sock,wrong,6,0);                       
+        recv(C_sock,wrong,7,0);                       
         printf("\nguess: %s\n",guess);
         printf("wrong: %s\n",wrong);
+        if(strlen(wrong)==7){
+            printf("\nYOU WIN !! Your opponent has been hanged");
+            closesocket(C_sock);
+            WSACleanup();
+            return 0;
+        }        
         i--;
     }
+    printf("\nYOU LOSE !! Your Opponent has Guessed the Word\n\n Try a Harder Word Next Time\n");
     closesocket(C_sock);
     WSACleanup();
     return 0;    
