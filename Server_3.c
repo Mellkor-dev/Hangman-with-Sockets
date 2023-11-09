@@ -12,7 +12,31 @@
 #pragma comment (lib, "Mswsock.lib")
 
 #define Buffer 512
-#define def_port "27015"
+#define def_port "25787"
+
+void red () {
+  printf("\033[1;31m");
+}
+
+void green (){
+  printf("\033[1;32m");
+}
+
+void blue () {
+  printf("\033[1;34m");
+}
+
+void yellow () {
+  printf("\033[1;33m");
+}
+
+void cyan () {
+  printf("\033[1;36m");
+}
+
+void reset () {
+  printf("\033[0m");
+}
 
 unsigned int conn(char *str) 
 {
@@ -70,7 +94,9 @@ unsigned int conn(char *str)
     }
 
     freeaddrinfo(result);
-    printf("Connection Is Being Established....\n");
+    blue();
+    printf("\nConnection Is Being Established....\n");
+    reset();
     res = listen(ListenSocket, SOMAXCONN);//syntax for listen is (socket , backlog); somaxconn refers to maximum no. of connections in queue(unaccepted).
     if (res == SOCKET_ERROR) {
         printf("listen failed with error: %d\n", WSAGetLastError());
@@ -88,7 +114,9 @@ unsigned int conn(char *str)
     }
     
     closesocket(ListenSocket);
-    printf("WORD HAS BEEN SENT\n");
+    green();
+    printf("\nWORD HAS BEEN SENT\n");
+    reset();
     res = recv(C_sock, rxbuff, rxbufflen, 0);
     s_res = send( C_sock, str, res, 0 );
     
@@ -107,8 +135,8 @@ unsigned int conn(char *str)
 }
 
 int main(){
-    char str[100],wrong[6],guess[50];
-    for (int i = 0; i < 6; i++)
+    char str[50],wrong[7],guess[100];
+    for (int i = 0; i < 7; i++)
     {
         wrong[i]=' ';
     }
@@ -120,26 +148,37 @@ int main(){
     // WSANETWORKEVENTS networkEvents;
 
     unsigned int C_sock;
-    printf("Enter word to be guessed: ");   
+    yellow();
+    printf("Enter word to be guessed: ");
+    reset();   
     scanf("%s", str);
     char *p = str;
     int i= (strlen(str)+6);
     C_sock = conn(p);
-    while (i>0 && (strcmp(guess,str)!=0))
+    while (i>0 && (strcmp(guess,str) != 0))
     {
         recv(C_sock,guess,100,0);
-        recv(C_sock,wrong,7,0);                       
+        recv(C_sock,wrong,7,0); 
+        cyan();                      
         printf("\nguess: %s\n",guess);
+        reset();
+        red();
         printf("wrong: %s\n",wrong);
-        if(strlen(wrong)==7){
+        reset();
+        // printf("\n%d\n",strlen(wrong));
+        if(strlen(wrong)==6){
+            green();
             printf("\nYOU WIN !! Your opponent has been hanged");
+            reset();
             closesocket(C_sock);
             WSACleanup();
             return 0;
         }        
         i--;
     }
+    red();
     printf("\nYOU LOSE !! Your Opponent has Guessed the Word\n\n Try a Harder Word Next Time\n");
+    reset();
     closesocket(C_sock);
     WSACleanup();
     return 0;    
